@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexicala Dictionary Search</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Dictionary Search</h1>
+    <form id="search-form">
+        <input type="text" id="word" placeholder="Enter a word" required>
+        <button type="submit">Search</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('search-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const word = document.getElementById('word').value;
+            const response = await fetch(`/search?word=${word}`);
+            const data = await response.json();
+            document.getElementById('results').innerHTML = `
+                <h2>Results for "${word}"</h2>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        });
+    </script>
+</body>
+</html>
