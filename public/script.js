@@ -1,57 +1,26 @@
-require('dotenv').config();
+document.getElementById('search-button').addEventListener('click', async () => {
+    const word = document.getElementById('word-input').value;
+    if (!word) return;
 
-document.getElementById('search-button').addEventListener('click', function () {
-    const query = document.getElementById('search-input').value;
-    fetchWordData(query);
-});
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = 'Loading...';
 
-function fetchWordData(query) {
-    const apiKey = process.env.LEXICALA_API_KEY;  // .envファイルからAPIキーを取得
-    const url = `https://lexicala1.p.rapidapi.com/search?source=global&language=en&text=${query}`;
+    try {
+        const response = await fetch(`/search?word=${word}`);
+        const data = await response.json();
 
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'X-RapidAPI-Key': apiKey,
-            'X-RapidAPI-Host': 'lexicala1.p.rapidapi.com'
+        if (data.error) {
+            resultDiv.innerHTML = 'Error fetching data';
+            return;
         }
-    })
-    .then(response => response.json())
-    .then(data => displayResults(data))
-    .catch(error => console.error('Error:', error));
-}
 
-function displayResults(data) {
-    const resultsContainer = document.getElementById('results');
-    resultsContainer.innerHTML = '';
+        const entry = data.results[0];
+        const senses = entry.senses.map(sense => {
+            return `<p><strong>${sense.definition}</strong><br>${sense.translations.map(t => t.text).join(', ')}</p>`;
+        }).join('');
 
-    if (data.results && data.results.length > 0) {
-        data.results.forEach(result => {
-            const item = document.createElement('div');
-            item.classList.add('result-item');
-
-            const word = document.createElement('h3');
-            word.textContent = result.headword.text;
-
-            const definition = document.createElement('p');
-            definition.textContent = `Definition: ${result.senses[0].definition}`;
-
-            const translation = document.createElement('p');
-            if (result.senses[0].translations) {
-                translation.textContent = `Translation: ${result.senses[0].translations[0].text}`;
-            } else {
-                translation.textContent = 'Translation: Not available';
-            }
-
-            item.appendChild(word);
-            item.appendChild(definition);
-            item.appendChild(translation);
-
-            resultsContainer.appendChild(item);
-        });
-    } else {
-        const noResult = document.createElement('p');
-        noResult.textContent = 'No results found.';
-        resultsContainer.appendChild(noResult);
+        resultDiv.innerHTML = `<h2>${entry.headword.text}</h2>${senses}`;
+    } catch (error) {
+        resultDiv.innerHTML = 'Error fetching data';
     }
-}
+});
