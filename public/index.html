@@ -9,8 +9,10 @@
 <body>
     <div class="container">
         <h1>Wordie2</h1>
-        <input type="text" id="word-input" placeholder="Enter a word to search...">
-        <button id="search-button">Search</button>
+        <form id="searchForm">
+            <input type="text" id="word" placeholder="Enter a word" required>
+            <button type="submit">Search</button>
+        </form>
         <div id="result"></div>
     </div>
     <script src="script.js"></script>
